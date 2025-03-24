@@ -13,6 +13,10 @@ import { ErrorCodeEnum } from "./enums/error-code.enum";
 import "./config/passport.config";
 import passport from "passport";
 import authRoutes from "./routes/auth.route";
+import userRoutes from "./routes/user.route";
+import isAuthnticated from "./middlewares/isAuthenticated.middleware";
+import workspaceRoute from "./routes/workspace.route";
+import memberRoutes from "./routes/member.route";
 
 
 const app = express();
@@ -50,14 +54,13 @@ app.get(
       "This is a bad request",
       ErrorCodeEnum.AUTH_INVALID_TOKEN
     );
-    return res.status(HTTPSTATUS.OK).json({
-      message: "Hello Subscribe to the channel & share",
-    });
   })
 );
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
-
+app.use(`${BASE_PATH}/user`, isAuthnticated ,userRoutes);
+app.use(`${BASE_PATH}/workspace`, isAuthnticated , workspaceRoute);
+app.use(`${BASE_PATH}/member`, isAuthnticated , memberRoutes);
 
 app.use(errorHandler);
 
