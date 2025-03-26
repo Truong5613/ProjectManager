@@ -11,11 +11,13 @@ import {
 const failedUrl = `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`;
 
 const authRoutes = Router();
-
+//dang ky 
 authRoutes.post("/register", registerUserController);
+//dang nhap
 authRoutes.post("/login", loginController);
-
+//dang xuat
 authRoutes.post("/logout", logOutController);
+//Dang nhap = google
 
 authRoutes.get(
   "/google",
