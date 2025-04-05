@@ -21,18 +21,17 @@ import {
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/logo";
 import GoogleOauthButton from "@/components/auth/google-oauth-button";
-import { loginMutationFn } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
-import { title } from "process";
+import { loginMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { Loader } from "lucide-react";
 
 const SignIn = () => {
   const navigate = useNavigate();
-
   const [searchParams] = useSearchParams();
   const returnUrl = searchParams.get("returnUrl");
 
-  const { mutate,isPending} = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: loginMutationFn,
   });
 
@@ -55,17 +54,21 @@ const SignIn = () => {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (isPending) return;
+
     mutate(values, {
       onSuccess: (data) => {
         const user = data.user;
-        navigate("/workspace/${user.currentWorkspace}");
+        console.log(user);
+        const decodedUrl = returnUrl ? decodeURIComponent(returnUrl) : null;
+        navigate(decodedUrl || `/workspace/${user.currentWorkspace}`);
       },
-      onError: (error) => 
+      onError: (error) => {
         toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      }),
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
     });
   };
 
@@ -77,7 +80,7 @@ const SignIn = () => {
           className="flex items-center gap-2 self-center font-medium"
         >
           <Logo />
-          Project Manager       
+          Project Manager
         </Link>
         <div className="flex flex-col gap-6">
           <Card>
@@ -111,7 +114,7 @@ const SignIn = () => {
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="user@email.com"
+                                  placeholder="user@gmail.com"
                                   className="!h-[48px]"
                                   {...field}
                                 />
@@ -152,7 +155,12 @@ const SignIn = () => {
                           )}
                         />
                       </div>
-                      <Button type="submit" className="w-full">
+                      <Button
+                        disabled={isPending}
+                        type="submit"
+                        className="w-full"
+                      >
+                        {isPending && <Loader className="animate-spin" />}
                         Login
                       </Button>
                     </div>
