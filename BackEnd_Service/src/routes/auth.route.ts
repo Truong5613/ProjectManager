@@ -21,9 +21,15 @@ authRoutes.post("/logout", logOutController);
 
 authRoutes.get(
   "/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  })
+  (req, res, next) => {
+    // Store the returnUrl in the session
+    if (req.query.returnUrl && req.session) {
+      req.session.returnUrl = req.query.returnUrl as string;
+    }
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+    })(req, res, next);
+  }
 );
 
 authRoutes.get(
@@ -31,7 +37,14 @@ authRoutes.get(
   passport.authenticate("google", {
     failureRedirect: failedUrl,
   }),
-  googleLoginCallback
+  (req, res, next) => {
+    // Pass the returnUrl from session to the callback
+    if (req.session && req.session.returnUrl) {
+      req.query.returnUrl = req.session.returnUrl;
+      delete req.session.returnUrl;
+    }
+    googleLoginCallback(req, res, next);
+  }
 );
 
 export default authRoutes;

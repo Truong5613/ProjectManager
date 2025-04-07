@@ -16,25 +16,25 @@ API.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const { data, status } = error.response;
+    const { data, status } = error.response || {};
 
-    if(data?.errorCode === "ACCESS_UNAUTHORIZED"){
+    const isAuthRoute = window.location.pathname === "/" || 
+                       window.location.pathname === "/sign-in" || 
+                       window.location.pathname === "/sign-up" ||
+                       window.location.pathname === "/google/oauth/callback" ||
+                       window.location.pathname.startsWith("/invite/workspace/");
+
+    if (!isAuthRoute && (data?.errorCode === "ACCESS_UNAUTHORIZED" || (data === "Unauthorized" && status === 401))) {
       window.location.href = "/";
       return;
     }
 
-    if (data === "Unauthorized" && status === 401) {
-      window.location.href = "/";
-    }
-
-    const CustomError : CustomError ={
+    const CustomError: CustomError = {
       ...error,
       errorCode: data?.errorCode || "UNKNOWN_ERROR",
-    }
+    };
 
-    return Promise.reject({
-      CustomError,
-    });
+    return Promise.reject(CustomError);
   }
 );
 

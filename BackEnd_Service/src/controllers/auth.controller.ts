@@ -9,6 +9,10 @@ import passport from "passport";
 export const googleLoginCallback = asyncHandler(
   async (req: Request, res: Response) => {
     const currentWorkspace = req.user?.currentWorkspace;
+    const returnUrl = req.query.returnUrl as string;
+    
+    console.log("Google callback - returnUrl:", returnUrl);
+    console.log("Google callback - currentWorkspace:", currentWorkspace);
 
     if (!currentWorkspace) {
       return res.redirect(
@@ -16,9 +20,16 @@ export const googleLoginCallback = asyncHandler(
       );
     }
 
-    return res.redirect(
-      `${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`
-    );
+    // Always redirect to the returnUrl if it exists, otherwise go to the workspace
+    if (returnUrl) {
+      const redirectUrl = `${config.FRONTEND_ORIGIN}${returnUrl}`;
+      console.log("Redirecting to returnUrl:", redirectUrl);
+      return res.redirect(redirectUrl);
+    }
+    
+    const workspaceUrl = `${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`;
+    console.log("Redirecting to workspace:", workspaceUrl);
+    return res.redirect(workspaceUrl);
   }
 );
 
