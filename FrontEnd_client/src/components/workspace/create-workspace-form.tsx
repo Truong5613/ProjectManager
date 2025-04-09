@@ -24,6 +24,7 @@ export default function CreateWorkspaceForm({
 }: {
   onClose: () => void;
 }) {
+  
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();

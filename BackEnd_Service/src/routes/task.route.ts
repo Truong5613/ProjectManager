@@ -3,7 +3,7 @@ import { createTaskController, deleteTaskController, getAllTasksController, getT
 
 const taskRoutes = Router();
 //Tao,cap nhat, xoa task cho project trong workspace
-taskRoutes.post("/projects/:projectId/workspace/:workspaceId/create", createTaskController);
+taskRoutes.post("/project/:projectId/workspace/:workspaceId/create", createTaskController);
 taskRoutes.delete("/:id/workspace/:workspaceId/delete", deleteTaskController);
 taskRoutes.put("/:id/project/:projectId/workspace/:workspaceId/update",updateTaskController);
 

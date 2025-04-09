@@ -19,8 +19,26 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useWorkspaceId from "@/hooks/use-workspace-id";
+import { createProjectMutationFn } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
-export default function CreateProjectForm() {
+export default function CreateProjectForm({
+  onClose,
+}: {
+  onClose: () => void;
+}) {
+  
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const workspaceId = useWorkspaceId();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: createProjectMutationFn,
+  });
+
   const [emoji, setEmoji] = useState("📊");
 
   const formSchema = z.object({
@@ -43,7 +61,38 @@ export default function CreateProjectForm() {
   };
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    if (isPending) return;
+    const payload = {
+      workspaceId,
+      data: {
+        emoji,
+        ...values,
+      },
+    };
+    mutate(payload, {
+      onSuccess: (data) => {
+        const project = data.project;
+        queryClient.invalidateQueries({
+          queryKey: ["allprojects", workspaceId],
+        });
+
+        toast({
+          title: "Success",
+          description: "Project created successfully",
+          variant: "success",
+        });
+
+        navigate(`/workspace/${workspaceId}/project/${project._id}`);
+        setTimeout(() => onClose(), 500);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   return (

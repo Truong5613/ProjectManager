@@ -5,11 +5,13 @@ import { ProjectType } from "@/types/api.type";
 import { useState } from "react";
 
 const EditProjectDialog = (props: { project?: ProjectType }) => {
+
   const [isOpen, setIsOpen] = useState(false);
 
   const onClose = () => {
     setIsOpen(false);
   };
+  
   return (
     <div>
       <Dialog modal={true} open={isOpen} onOpenChange={setIsOpen}>

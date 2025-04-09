@@ -31,14 +31,22 @@ import { NavProjects } from "./nav-projects";
 import { Separator } from "../ui/separator";
 import useWorkspaceId from "@/hooks/use-workspace-id";
 import { useAuthContext } from "@/context/auth-provider";
+import { getAvatarColor, getAvatarFallbackText } from "@/lib/helper";
 
 const Asidebar = () => {
+
+
+
   const {isLoading, user} = useAuthContext();
 
   const { open } = useSidebar();
   const workspaceId = useWorkspaceId();
-
   const [isOpen, setIsOpen] = useState(false);
+
+  const name: string = user?.name ?? "";
+  const initials = getAvatarFallbackText(name);
+  const avatarColor = getAvatarColor(name);
+
 
   return (
     <>
@@ -82,11 +90,11 @@ const Asidebar = () => {
                       size="lg"
                       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     >
+                      
                       <Avatar className="h-8 w-8 rounded-full">
                         <AvatarImage src={user?.profilePicture || ""}/>
-                        <AvatarFallback className="rounded-full border border-gray-500">
-                          {user?.name?.split(" ")?.[0].charAt(0)?.toUpperCase()}
-                          {user?.name?.split(" ")?.[1].charAt(0)?.toUpperCase()}
+                        <AvatarFallback className={avatarColor}>
+                          {initials}
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
