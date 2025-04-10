@@ -28,7 +28,7 @@ export const getCurrentUserQueryFn =
   };
 
 //""""""""""""""""" WORKSPACE """""""""""""""""
-//"""""""""""""""""""""""""""""""""""""""""""""
+//"""""""""""""""""""""""""""""""""""""""""""
 
 export const createWorkspaceMutationFn = async (
   data: CreateWorkspaceType
@@ -262,7 +262,13 @@ export const editTaskMutationFn = async ({
 //""""""""""""""""" USER """""""""""""""""
 //""""""""""""""""""""""""""""""""""""""""
 
-export const editUserProfileMutationFn = async (data: { displayName: string; email: string }) => {
-  const response = await API.put('/user/profile', data);
+
+
+export const updateUserProfileMutationFn = async (formData: FormData) => {
+  const response = await API.patch('/user/update-profile', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };

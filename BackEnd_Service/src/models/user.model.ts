@@ -6,6 +6,7 @@ export interface UserDocument extends Document {
   email: string;
   password?: string;
   profilePicture: string | null;
+  profilePicturePublicId: string | null;
   isActive: boolean;
   lastLogin: Date | null;
   createdAt: Date;
@@ -31,6 +32,10 @@ const userSchema = new Schema<UserDocument>(
     },
     password: { type: String, select: true },
     profilePicture: {
+      type: String,
+      default: null,
+    },
+    profilePicturePublicId: {
       type: String,
       default: null,
     },

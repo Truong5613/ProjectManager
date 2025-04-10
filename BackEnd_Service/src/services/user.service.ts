@@ -1,5 +1,6 @@
 import UserModel from "../models/user.model";
 import { BadRequestException } from "../utils/appError";
+import { uploadImageToCloudinary, deleteImageFromCloudinary } from "./cloudinary.service";
 
 export const getCurrentUserService = async (userId: string) => {
   const user = await UserModel.findById(userId)
@@ -17,19 +18,37 @@ export const getCurrentUserService = async (userId: string) => {
 
 export const updateUserProfileService = async (
   userId: string,
-  data: { displayName: string; email: string }
+  data: {
+    name?: string;
+    profilePicture?: Express.Multer.File;
+  }
 ) => {
-  const user = await UserModel.findByIdAndUpdate(
-    userId,
-    { $set: data },
-    { new: true, runValidators: true }
-  )
-    .populate("currentWorkspace")
-    .select("-password");
-
+  const user = await UserModel.findById(userId);
+  
   if (!user) {
     throw new BadRequestException("User not found");
   }
 
-  return { user };
+  if (data.name) {
+    user.name = data.name;
+  }
+
+  if (data.profilePicture) {
+    // Delete old image if exists
+    if (user.profilePicturePublicId) {
+      await deleteImageFromCloudinary(user.profilePicturePublicId);
+    }
+
+    // Upload new image
+    const { url, publicId } = await uploadImageToCloudinary(data.profilePicture);
+    user.profilePicture = url;
+    user.profilePicturePublicId = publicId;
+  }
+
+  await user.save();
+
+  return {
+    user: user.omitPassword(),
+  };
 };
+
