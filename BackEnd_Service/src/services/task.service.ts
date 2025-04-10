@@ -68,7 +68,10 @@ export const updateTaskService = async (
       dueDate?: string;
     }
   ) => {
-    const project = await ProjectModel.findById(projectId);
+    const project = await ProjectModel.findOne({
+      _id: projectId,
+      isDeleted: { $ne: true }
+    });
   
     if (!project || project.workspace.toString() !== workspaceId.toString()) {
       throw new NotFoundException(
@@ -76,7 +79,10 @@ export const updateTaskService = async (
       );
     }
   
-    const task = await TaskModel.findById(taskId);
+    const task = await TaskModel.findOne({
+      _id: taskId,
+      isDeleted: { $ne: true }
+    });
   
     if (!task || task.project.toString() !== projectId.toString()) {
       throw new NotFoundException(
@@ -117,6 +123,7 @@ export const getAllTasksService = async (
   ) => {
     const query: Record<string, any> = {
       workspace: workspaceId,
+      isDeleted: { $ne: true },
     };
   
     if (filters.projectId) {
@@ -191,6 +198,7 @@ export const getTaskByIdService = async (
       _id: taskId,
       workspace: workspaceId,
       project: projectId,
+      isDeleted: { $ne: true },
     }).populate("assignedTo", "_id name profilePicture -password");
   
     if (!task) {
@@ -205,7 +213,7 @@ export const deleteTaskService = async (
     workspaceId: string,
     taskId: string
   ) => {
-    const task = await TaskModel.findOneAndDelete({
+    const task = await TaskModel.findOne({
       _id: taskId,
       workspace: workspaceId,
     });
@@ -216,6 +224,10 @@ export const deleteTaskService = async (
       );
     }
   
-    return;
+    // Soft delete the task
+    task.isDeleted = true;
+    await task.save();
+  
+    return task;
   };
 

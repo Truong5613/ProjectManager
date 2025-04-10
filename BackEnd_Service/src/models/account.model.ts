@@ -7,6 +7,7 @@ export interface AccountDocument extends Document {
   userId: mongoose.Types.ObjectId;
   refreshToken: string | null;
   tokenExpiry: Date | null;
+  isDeleted: boolean;
   createdAt: Date;
 }
 
@@ -29,6 +30,7 @@ const accountSchema = new Schema<AccountDocument>(
     },
     refreshToken: { type: String, default: null },
     tokenExpiry: { type: Date, default: null },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
@@ -39,6 +41,14 @@ const accountSchema = new Schema<AccountDocument>(
     },
   }
 );
+
+// Add query middleware to filter out deleted documents by default
+accountSchema.pre(/^find/, function(this: mongoose.Query<any, any, {}, any>, next) {
+  if (!(this.getOptions().includeDeleted)) {
+    this.where({ isDeleted: { $ne: true } });
+  }
+  next();
+});
 
 const AccountModel = mongoose.model<AccountDocument>("Account", accountSchema);
 export default AccountModel;

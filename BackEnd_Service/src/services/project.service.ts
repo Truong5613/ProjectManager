@@ -35,12 +35,14 @@ export const getAllProjectsInWorkspaceService = async (
 ) => {
     const totalCount = await ProjectModel.countDocuments({
         workspace: workspaceId,
+        isDeleted: { $ne: true },
     });
 
     const skip = (pageNumber - 1) * pageSize;
 
     const projects = await ProjectModel.find({
         workspace: workspaceId,
+        isDeleted: { $ne: true },
     })
         .skip(skip)
         .limit(pageSize)
@@ -60,6 +62,7 @@ export const getProjectByIdAndWorkspaceIdService = async (
     const project = await ProjectModel.findOne({
       _id: projectId,
       workspace: workspaceId,
+      isDeleted: { $ne: true },
     }).select("_id emoji name description");
   
     if (!project) {
@@ -76,7 +79,10 @@ export const getProjectAnalyticsService = async (
     workspaceId: string,
     projectId: string
   ) => {
-    const project = await ProjectModel.findById(projectId);
+    const project = await ProjectModel.findOne({
+      _id: projectId,
+      isDeleted: { $ne: true }
+    });
   
     if (!project || project.workspace.toString() !== workspaceId.toString()) {
       throw new NotFoundException(
@@ -91,6 +97,7 @@ export const getProjectAnalyticsService = async (
       {
         $match: {
           project: new mongoose.Types.ObjectId(projectId),
+          isDeleted: { $ne: true },
         },
       },
       {
@@ -149,6 +156,7 @@ export const updateProjectService = async (
     const project = await ProjectModel.findOne({
       _id: projectId,
       workspace: workspaceId,
+      isDeleted: { $ne: true },
     });
   
     if (!project) {
@@ -182,11 +190,15 @@ export const deleteProjectService = async (
       );
     }
   
-    await project.deleteOne();
+    // Soft delete the project
+    project.isDeleted = true;
+    await project.save();
   
-    await TaskModel.deleteMany({
-      project: project._id,
-    });
+    // Soft delete all tasks associated with this project
+    await TaskModel.updateMany(
+      { project: project._id },
+      { isDeleted: true }
+    );
   
     return project;
   };

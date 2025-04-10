@@ -9,7 +9,10 @@ import { BadRequestException, NotFoundException, UnauthorizedException } from ".
 export const getMemberRoleInWorkspace = async (
     userId: string, workspaceId: string
 ) => {
-    const workspace = await WorkspaceModel.findById(workspaceId);
+    const workspace = await WorkspaceModel.findOne({
+      _id: workspaceId,
+      isDeleted: { $ne: true } // Explicitly filter out deleted workspaces
+    });
     if (!workspace) {
         throw new NotFoundException("Workspace not found");
     }
@@ -17,6 +20,7 @@ export const getMemberRoleInWorkspace = async (
     const member = await MemberModel.findOne({
         userId: userId,
         workspaceId: workspaceId,
+        isDeleted: { $ne: true } // Explicitly filter out deleted members
     }).populate("role");
 
     if (!member) {
@@ -67,4 +71,25 @@ export const joinWorkspaceByInviteService = async (
     await newMember.save();
   
     return { workspaceId: workspace._id, role: role.name };
+};
+
+// Soft delete a member from workspace
+export const softDeleteMemberService = async (
+  workspaceId: string,
+  memberId: string
+) => {
+  const member = await MemberModel.findOne({
+    _id: memberId,
+    workspaceId: workspaceId,
+  });
+
+  if (!member) {
+    throw new NotFoundException("Member not found in this workspace");
+  }
+
+  // Soft delete the member
+  member.isDeleted = true;
+  await member.save();
+
+  return { message: "Member removed from workspace successfully" };
 };

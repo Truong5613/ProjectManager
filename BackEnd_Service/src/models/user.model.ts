@@ -9,6 +9,7 @@ export interface UserDocument extends Document {
   profilePicturePublicId: string | null;
   isActive: boolean;
   lastLogin: Date | null;
+  isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
   currentWorkspace: mongoose.Types.ObjectId | null;
@@ -45,6 +46,7 @@ const userSchema = new Schema<UserDocument>(
     },
     isActive: { type: Boolean, default: true },
     lastLogin: { type: Date, default: null },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
@@ -69,6 +71,14 @@ userSchema.methods.omitPassword = function (): Omit<UserDocument, "password"> {
 userSchema.methods.comparePassword = async function (value: string) {
   return compareValue(value, this.password);
 };
+
+// Add query middleware to filter out deleted documents by default
+userSchema.pre(/^find/, function(this: mongoose.Query<any, any, {}, any>, next) {
+  if (!(this.getOptions().includeDeleted)) {
+    this.where({ isDeleted: { $ne: true } });
+  }
+  next();
+});
 
 const UserModel = mongoose.model<UserDocument>("User", userSchema);
 export default UserModel;

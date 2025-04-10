@@ -53,12 +53,20 @@ export const createWorkspaceService = async (
 
 //lay tat ca cac workspace cua user
 export const getAllWorkspacesUserIsMemberService = async (userid: string) => {
-    const memberships = await MemberModel.find({ userId: userid })
-    .populate("workspaceId")
+    const memberships = await MemberModel.find({ 
+      userId: userid,
+      isDeleted: { $ne: true }
+    })
+    .populate({
+      path: "workspaceId",
+      match: { isDeleted: { $ne: true } }
+    })
     .select("-password")
     .exec();
     
-    const workspaces = memberships.map((membership) => membership.workspaceId);
+    const workspaces = memberships
+      .map((membership) => membership.workspaceId)
+      .filter(workspace => workspace !== null);
     
     return {
         workspaces,
@@ -67,7 +75,10 @@ export const getAllWorkspacesUserIsMemberService = async (userid: string) => {
 
 //lay workspace theo id
 export const getWorkspaceByIdService = async (workspaceId: string) => {
-    const workspace = await WorkspaceModel.findById(workspaceId);
+    const workspace = await WorkspaceModel.findOne({
+      _id: workspaceId,
+      isDeleted: { $ne: true }
+    });
 
     if (!workspace) {
         throw new NotFoundException("Workspace not found");
@@ -75,6 +86,7 @@ export const getWorkspaceByIdService = async (workspaceId: string) => {
 
     const members = await MemberModel.find({
         workspaceId,
+        isDeleted: { $ne: true }
     }).populate("role");
 
     const workspaceWithMembers = {
@@ -93,6 +105,7 @@ export const getWorkspaceMembersService = async (workspaceId: string) => {
   
     const members = await MemberModel.find({
       workspaceId,
+      isDeleted: { $ne: true },
     })
       .populate("userId", "name email profilePicture -password")
       .populate("role", "name");
@@ -110,17 +123,20 @@ export const getWorkspaceAnalyticsService = async (workspaceId: string) => {
   
     const totalTasks = await TaskModel.countDocuments({
       workspace: workspaceId,
+      isDeleted: { $ne: true },
     });
   
     const overdueTasks = await TaskModel.countDocuments({
       workspace: workspaceId,
       dueDate: { $lt: currentDate },
       status: { $ne: TaskStatusEnum.DONE },
+      isDeleted: { $ne: true },
     });
   
     const completedTasks = await TaskModel.countDocuments({
       workspace: workspaceId,
       status: TaskStatusEnum.DONE,
+      isDeleted: { $ne: true },
     });
   
     const analytics = {
@@ -151,6 +167,7 @@ export const changeMemberRoleService = async (
     const member = await MemberModel.findOne({
       userId: memberId,
       workspaceId: workspaceId,
+      isDeleted: { $ne: true },
     });
   
     if (!member) {
@@ -214,20 +231,31 @@ export const deleteWorkspaceService = async (
         throw new NotFoundException("User not found");
       }
   
-      await ProjectModel.deleteMany({ workspace: workspace._id }).session(
-        session
-      );
-      await TaskModel.deleteMany({ workspace: workspace._id }).session(session);
+      // Soft delete all projects in the workspace
+      await ProjectModel.updateMany(
+        { workspace: workspace._id },
+        { isDeleted: true }
+      ).session(session);
+      
+      // Soft delete all tasks in the workspace
+      await TaskModel.updateMany(
+        { workspace: workspace._id },
+        { isDeleted: true }
+      ).session(session);
   
-      await MemberModel.deleteMany({
-        workspaceId: workspace._id,
-      }).session(session);
+      // Soft delete all members in the workspace
+      await MemberModel.updateMany(
+        { workspaceId: workspace._id },
+        { isDeleted: true }
+      ).session(session);
   
       // Cap nhat workspace hien tai cua user thanh 1 cai khac neu nhu cai hien tai bi xoa
       if (user?.currentWorkspace?.equals(workspaceId)) {
-        const memberWorkspace = await MemberModel.findOne({ userId }).session(
-          session
-        );
+        const memberWorkspace = await MemberModel.findOne({ 
+          userId,
+          isDeleted: { $ne: true }
+        }).session(session);
+        
         // Cap nhat workspace hien tai cua user thanh cai khac
         user.currentWorkspace = memberWorkspace
           ? memberWorkspace.workspaceId
@@ -236,7 +264,9 @@ export const deleteWorkspaceService = async (
         await user.save({ session });
       }
   
-      await workspace.deleteOne({ session });
+      // Soft delete the workspace
+      workspace.isDeleted = true;
+      await workspace.save({ session });
   
       await session.commitTransaction();
   

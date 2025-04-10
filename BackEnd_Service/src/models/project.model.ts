@@ -6,6 +6,7 @@ export interface ProjectDocument extends Document {
   emoji: string;
   workspace: mongoose.Types.ObjectId;
   createdBy: mongoose.Types.ObjectId;
+  isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,11 +35,20 @@ const projectSchema = new Schema<ProjectDocument>(
       ref: "User",
       required: true,
     },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
   }
 );
+
+// Add query middleware to filter out deleted documents by default
+projectSchema.pre(/^find/, function(this: mongoose.Query<any, any, {}, any>, next) {
+  if (!(this.getOptions().includeDeleted)) {
+    this.where({ isDeleted: { $ne: true } });
+  }
+  next();
+});
 
 const ProjectModel = mongoose.model<ProjectDocument>("Project", projectSchema);
 export default ProjectModel;

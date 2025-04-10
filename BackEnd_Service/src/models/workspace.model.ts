@@ -6,6 +6,7 @@ export interface WorkspaceDocument extends Document {
   description: string;
   owner: mongoose.Types.ObjectId;
   inviteCode: string;
+  isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,6 +26,7 @@ const workspaceSchema = new Schema<WorkspaceDocument>(
       unique: true,
       default: generateInviteCode,
     },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
@@ -34,6 +36,14 @@ const workspaceSchema = new Schema<WorkspaceDocument>(
 workspaceSchema.methods.resetInviteCode = function () {
   this.inviteCode = generateInviteCode();
 };
+
+// Add query middleware to filter out deleted documents by default
+workspaceSchema.pre(/^find/, function(this: mongoose.Query<any, any, {}, any>, next) {
+  if (!(this.getOptions().includeDeleted)) {
+    this.where({ isDeleted: { $ne: true } });
+  }
+  next();
+});
 
 const WorkspaceModel = mongoose.model<WorkspaceDocument>(
   "Workspace",

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { HTTPSTATUS } from "../config/http.config";
-import { getCurrentUserService, updateUserProfileService } from "../services/user.service";
+import { getCurrentUserService, updateUserProfileService, softDeleteUserService } from "../services/user.service";
 
 export const getCurrentUserController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -30,6 +30,18 @@ export const updateUserProfileController = asyncHandler(
     return res.status(HTTPSTATUS.OK).json({
       message: "Profile updated successfully",
       user,
+    });
+  }
+);
+
+export const softDeleteUserController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+
+    const { message } = await softDeleteUserService(userId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message,
     });
   }
 );

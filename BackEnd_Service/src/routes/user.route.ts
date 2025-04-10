@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getCurrentUserController, updateUserProfileController } from "../controllers/user.controller";
+import { getCurrentUserController, updateUserProfileController, softDeleteUserController } from "../controllers/user.controller";
 import { passportAuthenticateJwt } from "../config/passport.config";
 import { upload } from "../middlewares/upload.middleware";
 
@@ -14,6 +14,13 @@ userRoutes.patch(
   passportAuthenticateJwt,
   upload.single('profilePicture'),
   updateUserProfileController
+);
+
+//Soft delete user
+userRoutes.delete(
+  "/delete",
+  passportAuthenticateJwt,
+  softDeleteUserController
 );
 
 export default userRoutes;

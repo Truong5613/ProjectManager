@@ -10,6 +10,7 @@ import { RolePermissions } from "../utils/role-permission";
 export interface RoleDocument extends Document {
   name: RoleType;
   permissions: Array<PermissionType>;
+  isDeleted: boolean;
 }
 
 const roleSchema = new Schema<RoleDocument>(
@@ -28,11 +29,20 @@ const roleSchema = new Schema<RoleDocument>(
         return RolePermissions[this.name];
       },
     },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
   }
 );
+
+// Add query middleware to filter out deleted documents by default
+roleSchema.pre(/^find/, function(this: mongoose.Query<any, any, {}, any>, next) {
+  if (!(this.getOptions().includeDeleted)) {
+    this.where({ isDeleted: { $ne: true } });
+  }
+  next();
+});
 
 const RoleModel = mongoose.model<RoleDocument>("Role", roleSchema);
 export default RoleModel;

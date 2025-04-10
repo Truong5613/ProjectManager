@@ -3,7 +3,10 @@ import { BadRequestException } from "../utils/appError";
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from "./cloudinary.service";
 
 export const getCurrentUserService = async (userId: string) => {
-  const user = await UserModel.findById(userId)
+  const user = await UserModel.findOne({
+    _id: userId,
+    isDeleted: { $ne: true } // Explicitly filter out deleted users
+  })
     .populate("currentWorkspace")
     .select("-password");
 
@@ -23,7 +26,10 @@ export const updateUserProfileService = async (
     profilePicture?: Express.Multer.File;
   }
 ) => {
-  const user = await UserModel.findById(userId);
+  const user = await UserModel.findOne({
+    _id: userId,
+    isDeleted: { $ne: true } // Explicitly filter out deleted users
+  });
   
   if (!user) {
     throw new BadRequestException("User not found");
@@ -49,6 +55,22 @@ export const updateUserProfileService = async (
 
   return {
     user: user.omitPassword(),
+  };
+};
+
+export const softDeleteUserService = async (userId: string) => {
+  const user = await UserModel.findById(userId);
+  
+  if (!user) {
+    throw new BadRequestException("User not found");
+  }
+
+  // Set isDeleted flag to true
+  user.isDeleted = true;
+  await user.save();
+
+  return {
+    message: "User deleted successfully",
   };
 };
 

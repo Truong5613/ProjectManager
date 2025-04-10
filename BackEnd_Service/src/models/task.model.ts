@@ -18,6 +18,7 @@ export interface TaskDocument extends Document {
   assignedTo: mongoose.Types.ObjectId | null;
   createdBy: mongoose.Types.ObjectId;
   dueDate: Date | null;
+  isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,11 +74,20 @@ const taskSchema = new Schema<TaskDocument>(
       type: Date,
       default: null,
     },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
   }
 );
+
+// Add query middleware to filter out deleted documents by default
+taskSchema.pre(/^find/, function(this: mongoose.Query<any, any, {}, any>, next) {
+  if (!(this.getOptions().includeDeleted)) {
+    this.where({ isDeleted: { $ne: true } });
+  }
+  next();
+});
 
 const TaskModel = mongoose.model<TaskDocument>("Task", taskSchema);
 

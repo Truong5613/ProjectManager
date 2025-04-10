@@ -6,6 +6,7 @@ export interface MemberDocument extends Document {
   workspaceId: mongoose.Types.ObjectId;
   role: RoleDocument;
   joinedAt: Date;
+  isDeleted: boolean;
 }
 
 const memberSchema = new Schema<MemberDocument>(
@@ -29,11 +30,20 @@ const memberSchema = new Schema<MemberDocument>(
       type: Date,
       default: Date.now,
     },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
   }
 );
+
+// Add query middleware to filter out deleted documents by default
+memberSchema.pre(/^find/, function(this: mongoose.Query<any, any, {}, any>, next) {
+  if (!(this.getOptions().includeDeleted)) {
+    this.where({ isDeleted: { $ne: true } });
+  }
+  next();
+});
 
 const MemberModel = mongoose.model<MemberDocument>("Member", memberSchema);
 export default MemberModel;
