@@ -4,10 +4,14 @@ import {
   TaskStatusEnumType,
 } from "@/constant";
 
+// Re-export the task enum types
+export type { TaskPriorityEnumType, TaskStatusEnumType };
+
 export type loginType = { email: string; password: string };
 
 export type LoginResponseType = {
   message: string;
+  access_token: string;
   user: {
     _id: string;
     currentWorkspace: string;

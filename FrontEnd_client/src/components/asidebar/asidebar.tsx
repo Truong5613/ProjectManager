@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { EllipsisIcon, Loader, LogOut } from "lucide-react";
+import { EllipsisIcon, Loader, LogOut, User } from "lucide-react";
 import {
   Sidebar,
   SidebarHeader,
@@ -116,8 +116,14 @@ const Asidebar = () => {
                   >
                     <DropdownMenuGroup></DropdownMenuGroup>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/user/profile">
+                        <User className="mr-2 h-4 w-4" />
+                        Edit Profile
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setIsOpen(true)}>
-                      <LogOut />
+                      <LogOut className="mr-2 h-4 w-4" />
                       Log out
                     </DropdownMenuItem>
                   </DropdownMenuContent>

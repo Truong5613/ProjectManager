@@ -5,31 +5,29 @@ import { registerSchema } from "../validation/auth.validation";
 import { HTTPSTATUS } from "../config/http.config";
 import { registerUserService } from "../services/auth.service";
 import passport from "passport";
+import { signJwtToken } from "../utils/jwt-helper";
 
 export const googleLoginCallback = asyncHandler(
   async (req: Request, res: Response) => {
+    const jwt = req.jwt;
     const currentWorkspace = req.user?.currentWorkspace;
     const returnUrl = req.query.returnUrl as string;
     
     console.log("Google callback - returnUrl:", returnUrl);
     console.log("Google callback - currentWorkspace:", currentWorkspace);
+    console.log("Google callback - JWT token:", jwt ? "Present" : "Missing");
 
-    if (!currentWorkspace) {
+    if (!jwt) {
+      console.log("Google callback - No JWT token, redirecting to failure URL");
       return res.redirect(
         `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`
       );
     }
 
-    // Always redirect to the returnUrl if it exists, otherwise go to the workspace
-    if (returnUrl) {
-      const redirectUrl = `${config.FRONTEND_ORIGIN}${returnUrl}`;
-      console.log("Redirecting to returnUrl:", redirectUrl);
-      return res.redirect(redirectUrl);
-    }
-    
-    const workspaceUrl = `${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`;
-    console.log("Redirecting to workspace:", workspaceUrl);
-    return res.redirect(workspaceUrl);
+    // Redirect to the Google OAuth callback URL with the JWT token and current workspace
+    const redirectUrl = `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=success&access_token=${jwt}&current_workspace=${currentWorkspace}`;
+    console.log("Google callback - Redirecting to:", redirectUrl);
+    return res.redirect(redirectUrl);
   }
 );
 
@@ -66,16 +64,25 @@ export const loginController = asyncHandler(
           });
         }
 
-        req.logIn(user, (err) => {
-          if (err) {
-            return next(err);
-          }
+        // req.logIn(user, (err) => {
+        //   if (err) {
+        //     return next(err);
+        //   }
 
-          return res.status(HTTPSTATUS.OK).json({
+        //   return res.status(HTTPSTATUS.OK).json({
+        //     message: "Logged in successfully",
+        //     user,
+        //   });
+        // });
+
+        const access_token = signJwtToken ({userId:user._id})
+
+           return res.status(HTTPSTATUS.OK).json({
             message: "Logged in successfully",
+            access_token,
             user,
           });
-        });
+        
       }
     )(req, res, next);
   }

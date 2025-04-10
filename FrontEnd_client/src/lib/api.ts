@@ -1,5 +1,5 @@
 import API from "./axios-client";
-import { AllMembersInWorkspaceResponseType, AllProjectPayloadType, AllProjectResponseType, AllTaskPayloadType, AllTaskResponseType, AllWorkspaceResponseType, AnalyticsResponseType, ChangeWorkspaceMemberRoleType, CreateProjectPayloadType, CreateTaskPayloadType, CreateWorkspaceResponseType, CreateWorkspaceType, CurrentUserResponseType, EditProjectPayloadType, EditWorkspaceType, LoginResponseType, loginType, ProjectByIdPayloadType, ProjectResponseType, registerType, WorkspaceByIdResponseType } from "@/types/api.type";
+import { AllMembersInWorkspaceResponseType, AllProjectPayloadType, AllProjectResponseType, AllTaskPayloadType, AllTaskResponseType, AllWorkspaceResponseType, AnalyticsResponseType, ChangeWorkspaceMemberRoleType, CreateProjectPayloadType, CreateTaskPayloadType, CreateWorkspaceResponseType, CreateWorkspaceType, CurrentUserResponseType, EditProjectPayloadType, EditWorkspaceType, LoginResponseType, loginType, ProjectByIdPayloadType, ProjectResponseType, registerType, WorkspaceByIdResponseType, TaskType, TaskPriorityEnumType, TaskStatusEnumType } from "@/types/api.type";
 
 
 
@@ -229,5 +229,40 @@ export const deleteTaskMutationFn = async ({
   const response = await API.delete(
     `task/${taskId}/workspace/${workspaceId}/delete`
   );
+  return response.data;
+};
+
+export const editTaskMutationFn = async ({
+  workspaceId,
+  taskId,
+  data,
+}: {
+  workspaceId: string;
+  taskId: string;
+  data: {
+    title: string;
+    description: string;
+    priority: TaskPriorityEnumType;
+    status: TaskStatusEnumType;
+    assignedTo: string;
+    dueDate: string;
+    projectId: string;
+  };
+}): Promise<{
+  message: string;
+  task: TaskType;
+}> => {
+  const response = await API.put(
+    `/task/${taskId}/project/${data.projectId}/workspace/${workspaceId}/update`,
+    data
+  );
+  return response.data;
+};
+
+//""""""""""""""""" USER """""""""""""""""
+//""""""""""""""""""""""""""""""""""""""""
+
+export const editUserProfileMutationFn = async (data: { displayName: string; email: string }) => {
+  const response = await API.put('/user/profile', data);
   return response.data;
 };

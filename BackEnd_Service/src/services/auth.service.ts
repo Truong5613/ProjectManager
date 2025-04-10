@@ -186,3 +186,10 @@ export const verifyUserService = async ({
 
   return user.omitPassword();
 };
+
+export const findUserByIdService = async(userid:string)=>{
+  const user = await UserModel.findById(userid,{
+    password: false,
+  });
+  return user || null;
+}

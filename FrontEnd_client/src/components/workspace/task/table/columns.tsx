@@ -19,6 +19,13 @@ import {
 import { priorities, statuses } from "./data";
 import { TaskType } from "@/types/api.type";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteTaskMutationFn } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
+import useWorkspaceId from "@/hooks/use-workspace-id";
+import EditTaskDialog from "../edit-task-dialog";
 
 export const getColumns = (projectId?: string): ColumnDef<TaskType>[] => {
   const columns: ColumnDef<TaskType>[] = [
@@ -207,10 +214,51 @@ export const getColumns = (projectId?: string): ColumnDef<TaskType>[] => {
     {
       id: "actions",
       cell: ({ row }) => {
+        const task = row.original;
+        const queryClient = useQueryClient();
+        const workspaceId = useWorkspaceId();
+
+        const { mutate: deleteTask } = useMutation({
+          mutationFn: deleteTaskMutationFn,
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: ["all-tasks", workspaceId],
+            });
+            toast({
+              title: "Success",
+              description: "Task deleted successfully",
+              variant: "success",
+            });
+          },
+          onError: (error) => {
+            toast({
+              title: "Error",
+              description: error.message,
+              variant: "destructive",
+            });
+          },
+        });
+
+        const handleDelete = () => {
+          if (window.confirm("Are you sure you want to delete this task?")) {
+            deleteTask({
+              workspaceId,
+              taskId: task._id,
+            });
+          }
+        };
+
         return (
-          <>
-            <DataTableRowActions row={row} />
-          </>
+          <div className="flex items-center gap-2">
+            <EditTaskDialog task={task} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDelete}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         );
       },
     },

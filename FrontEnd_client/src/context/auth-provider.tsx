@@ -1,96 +1,86 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getCurrentUserQueryFn } from "@/lib/api";
+import { UserType } from "@/types/api.type";
 import useWorkspaceId from "@/hooks/use-workspace-id";
 import useAuth from "@/hooks/api/use-auth";
-import { UserType, WorkspaceType } from "@/types/api.type";
 import useGetWorkspaceQuery from "@/hooks/api/use-get-workspace";
-import { useNavigate } from "react-router-dom";
 import usePermissions from "@/hooks/use-permissions";
 import { PermissionType } from "@/constant";
 
-
-// Define the context shape
-type AuthContextType = {
-  user?: UserType;
-  workspace?: WorkspaceType;
+interface AuthContextType {
+  user: UserType | null;
+  workspace: any;
   hasPermission: (permission: PermissionType) => boolean;
-  error: any;
+  error: Error | null;
   isLoading: boolean;
   isFetching: boolean;
   workspaceLoading: boolean;
   refetchAuth: () => void;
   refetchWorkspace: () => void;
-};
+  setUser: (user: UserType | null) => void;
+  isAuthenticated: boolean;
+}
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  
-  const navigate = useNavigate();
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const workspaceId = useWorkspaceId();
 
-    
   const {
-    data:authData,
-    error:authError,
+    data: authData,
+    error: authError,
     isLoading,
     isFetching,
     refetch: refetchAuth,
   } = useAuth();
 
-  const user = authData?.user;
-
   const {
     data: workspaceData,
-    isLoading: workspaceLoading,
     error: workspaceError,
+    isLoading: workspaceLoading,
     refetch: refetchWorkspace,
   } = useGetWorkspaceQuery(workspaceId);
-  
-  const workspace = workspaceData?.workspace;
-  
-  useEffect(() => {
-    if (workspaceError) {
-      if (workspaceError?.errorCode === "ACCESS_UNAUTHORIZED") {
-        
-        navigate("/"); // Redirect if the user is not a member of the workspace
-      }
-    }
-  }, [navigate, workspaceError]);
 
-  const permissions = usePermissions(user, workspace);
+  const permissions = usePermissions(authData?.user, workspaceData?.workspace);
 
   const hasPermission = (permission: PermissionType): boolean => {
     return permissions.includes(permission);
   };
 
+  const [authUser, setAuthUser] = useState<UserType | null>(null);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        workspace,
-        hasPermission,
-        error: authError || workspaceError,
-        isLoading,
-        isFetching,
-        workspaceLoading,
-        refetchAuth,
-        refetchWorkspace,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-    
-  );
+  useEffect(() => {
+    if (authData?.user) {
+      setAuthUser(authData.user);
+    }
+  }, [authData]);
+
+  const setUser = (user: UserType | null) => {
+    setAuthUser(user);
+  };
+
+  const value: AuthContextType = {
+    user: authUser,
+    workspace: workspaceData?.workspace,
+    hasPermission,
+    error: authError || workspaceError,
+    isLoading,
+    isFetching,
+    workspaceLoading,
+    refetchAuth,
+    refetchWorkspace,
+    setUser,
+    isAuthenticated: !!authUser,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuthContext = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useCurrentUserContext must be used within a AuthProvider");
+    throw new Error("useAuthContext must be used within an AuthProvider");
   }
   return context;
 };
