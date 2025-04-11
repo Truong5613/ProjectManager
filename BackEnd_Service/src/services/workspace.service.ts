@@ -219,17 +219,13 @@ export const deleteWorkspaceService = async (
         throw new NotFoundException("Workspace not found");
       }
   
-      // Kiem tra xem co phai la chu workspace khong?
-      if (workspace.owner.toString() !== userId) {
-        throw new BadRequestException(
-          "You are not authorized to delete this workspace"
-        );
-      }
-  
       const user = await UserModel.findById(userId).session(session);
       if (!user) {
         throw new NotFoundException("User not found");
       }
+
+      // Get user's name and email
+      const { name, email } = user;
   
       // Soft delete all projects in the workspace
       await ProjectModel.updateMany(

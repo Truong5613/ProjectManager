@@ -93,3 +93,41 @@ export const softDeleteMemberService = async (
 
   return { message: "Member removed from workspace successfully" };
 };
+
+// Delete a member from workspace (only owner can do this)
+export const deleteMemberService = async (
+  workspaceId: string,
+  memberId: string,
+  userId: string
+) => {
+  // Check if the user is the owner of the workspace
+  const userMember = await MemberModel.findOne({
+    userId: userId,
+    workspaceId: workspaceId,
+    isDeleted: { $ne: true }
+  }).populate('role');
+
+  if (!userMember || userMember.role.name !== Roles.OWNER) {
+    throw new UnauthorizedException(
+      "Only workspace owner can delete members",
+      ErrorCodeEnum.ACCESS_UNAUTHORIZED
+    );
+  }
+
+  // Find the member to delete by userId
+  const member = await MemberModel.findOne({
+    userId: memberId,
+    workspaceId: workspaceId,
+    isDeleted: { $ne: true }
+  });
+
+  if (!member) {
+    throw new NotFoundException("Member not found in this workspace");
+  }
+
+  // Soft delete the member
+  member.isDeleted = true;
+  await member.save();
+
+  return { message: "Member removed from workspace successfully" };
+};

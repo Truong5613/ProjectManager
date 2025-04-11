@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pencil } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import EditTaskForm from "./edit-task-form";
 import { TaskType } from "@/types/api.type";
@@ -21,6 +21,9 @@ const EditTaskDialog = (props: { task: TaskType }) => {
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-lg max-h-auto my-5 border-0">
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+          </DialogHeader>
           <EditTaskForm task={props.task} onClose={onClose} />
         </DialogContent>
       </Dialog>

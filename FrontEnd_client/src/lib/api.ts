@@ -105,6 +105,21 @@ export const invitedUserJoinWorkspaceMutationFn = async (
   return response.data;
 };
 
+export const deleteMemberMutationFn = async ({
+  workspaceId,
+  memberId,
+}: {
+  workspaceId: string;
+  memberId: string;
+}): Promise<{
+  message: string;
+}> => {
+  const response = await API.delete(
+    `/member/workspace/${workspaceId}/member/${memberId}`
+  );
+  return response.data;
+};
+
 //""""""""""""""""" PROJECTS """""""""""""""""
 //""""""""""""""""""""""""""""""""""""""""""""
 

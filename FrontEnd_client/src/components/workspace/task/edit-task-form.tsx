@@ -49,6 +49,28 @@ export default function EditTaskForm(props: {
 
   const { mutate, isPending } = useMutation({
     mutationFn: editTaskMutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ["workspaceAnalytics", workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ["recentTasks", workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ["task", task._id] });
+      // Invalidate project analytics when task status changes
+      if (task.project?._id) {
+        queryClient.invalidateQueries({ queryKey: ["project-analytics", task.project._id] });
+      }
+      toast({
+        title: "Success",
+        description: "Task updated successfully",
+      });
+      onClose();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   const { data: projectData, isLoading: isProjectsLoading } = useGetProjectsInWorkspaceQuery({
@@ -152,31 +174,7 @@ export default function EditTaskForm(props: {
       },
     };
 
-    mutate(payload, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["project-analytics", task.project?._id],
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ["all-tasks", workspaceId],
-        });
-
-        toast({
-          title: "Success",
-          description: "Task updated successfully",
-          variant: "success",
-        });
-        onClose();
-      },
-      onError: (error) => {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
+    mutate(payload);
   };
 
   return (

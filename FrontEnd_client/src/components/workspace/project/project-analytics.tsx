@@ -7,14 +7,15 @@ import { getProjectAnalyticsQueryFn } from "@/lib/api";
 const ProjectAnalytics = () => {
   const param = useParams();
   const projectId = param.projectId as string;
-
   const workspaceId = useWorkspaceId();
 
   const { data, isPending } = useQuery({
     queryKey: ["project-analytics", projectId],
     queryFn: () => getProjectAnalyticsQueryFn({ workspaceId, projectId }),
-    staleTime: 0,
-    enabled: !!projectId,
+    staleTime: 0, // Always consider data stale to ensure fresh data
+    refetchOnMount: true, // Refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    enabled: !!projectId, // Only fetch if we have a projectId
   });
 
   const analytics = data?.analytics;

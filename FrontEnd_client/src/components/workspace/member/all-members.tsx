@@ -22,13 +22,22 @@ import { Permissions } from "@/constant";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useWorkspaceId from "@/hooks/use-workspace-id";
 import useGetWorkspaceMembers from "@/hooks/api/use-get-workspace-members";
-import { changeWorkspaceMemberRoleMutationFn } from "@/lib/api";
+import { changeWorkspaceMemberRoleMutationFn, deleteMemberMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import PermissionsGuard from "@/components/resuable/permission-guard";
 
 const AllMembers = () => {
   const { user, hasPermission } = useAuthContext();
 
   const canChangeMemberRole = hasPermission(Permissions.CHANGE_MEMBER_ROLE);
+  const canManageWorkspace = hasPermission(Permissions.MANAGE_WORKSPACE_SETTINGS);
 
   const queryClient = useQueryClient();
   const workspaceId = useWorkspaceId();
@@ -39,6 +48,25 @@ const AllMembers = () => {
 
   const { mutate, isPending: isLoading } = useMutation({
     mutationFn: changeWorkspaceMemberRoleMutationFn,
+  });
+
+  const deleteMemberMutation = useMutation({
+    mutationFn: deleteMemberMutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["members", workspaceId] });
+      toast({
+        title: "Success",
+        description: "Member removed successfully",
+        variant: "success"
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to remove member",
+        variant: "destructive"
+      });
+    },
   });
 
   const handleSelect = (roleId: string, memberId: string) => {
@@ -71,7 +99,15 @@ const AllMembers = () => {
     });
   };
 
-  
+  const handleDeleteMember = (memberId: string) => {
+    if (window.confirm("Are you sure you want to remove this member?")) {
+      deleteMemberMutation.mutate({
+        workspaceId,
+        memberId,
+      });
+    }
+  };
+
   return (
     <div className="grid gap-6 pt-2">
       {isPending ? (
@@ -83,7 +119,7 @@ const AllMembers = () => {
         const initials = getAvatarFallbackText(name);
         const avatarColor = getAvatarColor(name);
         return (
-          <div className="flex items-center justify-between space-x-4">
+          <div key={member._id} className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
               <Avatar className="h-8 w-8">
                 <AvatarImage
@@ -102,74 +138,91 @@ const AllMembers = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="ml-auto min-w-24 capitalize disabled:opacity-95 disabled:pointer-events-none"
-                    disabled={
-                      isLoading ||
-                      !canChangeMemberRole ||
-                      member.userId._id === user?._id
-                    }
-                  >
-                    {member.role.name?.toLowerCase()}{" "}
-                    {canChangeMemberRole && member.userId._id !== user?._id && (
-                      <ChevronDown className="text-muted-foreground" />
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                {canChangeMemberRole && (
-                  <PopoverContent className="p-0" align="end">
-                    <Command>
-                      <CommandInput
-                        placeholder="Select new role..."
-                        disabled={isLoading}
-                        className="disabled:pointer-events-none"
-                      />
-                      <CommandList>
-                        {isLoading ? (
-                          <Loader className="w-8 h-8 animate-spin place-self-center flex my-4" />
-                        ) : (
-                          <>
-                            <CommandEmpty>No roles found.</CommandEmpty>
-                            <CommandGroup>
-                              {roles?.map(
-                                (role) =>
-                                  role.name !== "OWNER" && (
-                                    <CommandItem
-                                      key={role._id}
-                                      disabled={isLoading}
-                                      className="disabled:pointer-events-none gap-1 mb-1  flex flex-col items-start px-4 py-2 cursor-pointer"
-                                      onSelect={() => {
-                                        handleSelect(
-                                          role._id,
-                                          member.userId._id
-                                        );
-                                      }}
-                                    >
-                                      <p className="capitalize">
-                                        {role.name?.toLowerCase()}
-                                      </p>
-                                      <p className="text-sm text-muted-foreground">
-                                        {role.name === "ADMIN" &&
-                                          `Can view, create, edit tasks, project and manage settings .`}
-
-                                        {role.name === "MEMBER" &&
-                                          `Can view,edit only task created by.`}
-                                      </p>
-                                    </CommandItem>
-                                  )
-                              )}
-                            </CommandGroup>
-                          </>
+              {member.role.name !== "OWNER" && (
+                <>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="ml-auto min-w-24 capitalize disabled:opacity-95 disabled:pointer-events-none"
+                        disabled={
+                          isLoading ||
+                          !canChangeMemberRole ||
+                          member.userId._id === user?._id
+                        }
+                      >
+                        {member.role.name?.toLowerCase()}{" "}
+                        {canChangeMemberRole && member.userId._id !== user?._id && (
+                          <ChevronDown className="text-muted-foreground" />
                         )}
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                )}
-              </Popover>
+                      </Button>
+                    </PopoverTrigger>
+                    {canChangeMemberRole && (
+                      <PopoverContent className="p-0" align="end">
+                        <Command>
+                          <CommandInput
+                            placeholder="Select new role..."
+                            disabled={isLoading}
+                            className="disabled:pointer-events-none"
+                          />
+                          <CommandList>
+                            {isLoading ? (
+                              <Loader className="w-8 h-8 animate-spin place-self-center flex my-4" />
+                            ) : (
+                              <>
+                                <CommandEmpty>No roles found.</CommandEmpty>
+                                <CommandGroup>
+                                  {roles?.map(
+                                    (role) =>
+                                      role.name !== "OWNER" && (
+                                        <CommandItem
+                                          key={role._id}
+                                          disabled={isLoading}
+                                          className="disabled:pointer-events-none gap-1 mb-1  flex flex-col items-start px-4 py-2 cursor-pointer"
+                                          onSelect={() => {
+                                            handleSelect(
+                                              role._id,
+                                              member.userId._id
+                                            );
+                                          }}
+                                        >
+                                          <p className="capitalize">
+                                            {role.name?.toLowerCase()}
+                                          </p>
+                                          <p className="text-sm text-muted-foreground">
+                                            {role.name === "ADMIN" &&
+                                              `Can view, create, edit tasks, project and manage settings .`}
+
+                                            {role.name === "MEMBER" &&
+                                              `Can view,edit only task created by.`}
+                                          </p>
+                                        </CommandItem>
+                                      )
+                                  )}
+                                </CommandGroup>
+                              </>
+                            )}
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    )}
+                  </Popover>
+                  <PermissionsGuard requiredPermission={Permissions.MANAGE_WORKSPACE_SETTINGS}>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteMember(member.userId._id)}
+                      disabled={member.userId._id === user?._id}
+                    >
+                      Remove
+                    </Button>
+                  </PermissionsGuard>
+                </>
+              )}
+              {member.role.name === "OWNER" && (
+                <span className="text-sm font-medium text-gray-500">Owner</span>
+              )}
             </div>
           </div>
         );

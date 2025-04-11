@@ -224,6 +224,11 @@ export const getColumns = (projectId?: string): ColumnDef<TaskType>[] => {
             queryClient.invalidateQueries({
               queryKey: ["all-tasks", workspaceId],
             });
+            if (task.project?._id) {
+              queryClient.invalidateQueries({
+                queryKey: ["project-analytics", task.project._id],
+              });
+            }
             toast({
               title: "Success",
               description: "Task deleted successfully",
