@@ -22,13 +22,12 @@ authRoutes.post("/logout", logOutController);
 authRoutes.get(
   "/google",
   (req, res, next) => {
-    // Store the returnUrl in the session
-    if (req.query.returnUrl && req.session) {
-      req.session.returnUrl = req.query.returnUrl as string;
-    }
+    // Pass returnUrl directly to the state parameter
+    const state = req.query.returnUrl ? encodeURIComponent(req.query.returnUrl as string) : undefined;
     passport.authenticate("google", {
       scope: ["profile", "email"],
       session: false,
+      state: state
     })(req, res, next);
   }
 );
@@ -40,13 +39,13 @@ authRoutes.get(
     session: false,
   }),
   (req, res, next) => {
-    // Pass the returnUrl from session to the callback
-    if (req.session && req.session.returnUrl) {
-      req.query.returnUrl = req.session.returnUrl;
-      delete req.session.returnUrl;
+    // Get returnUrl from state parameter
+    if (req.query.state) {
+      req.query.returnUrl = decodeURIComponent(req.query.state as string);
     }
-    googleLoginCallback(req, res, next);
-  }
+    next();
+  },
+  googleLoginCallback
 );
 
 export default authRoutes;

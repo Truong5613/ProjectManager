@@ -10,24 +10,25 @@ import { signJwtToken } from "../utils/jwt-helper";
 export const googleLoginCallback = asyncHandler(
   async (req: Request, res: Response) => {
     const jwt = req.jwt;
-    const currentWorkspace = req.user?.currentWorkspace;
+    const currentWorkspace = req.user?.currentWorkspace?.toString();
     const returnUrl = req.query.returnUrl as string;
-    
-    console.log("Google callback - returnUrl:", returnUrl);
-    console.log("Google callback - currentWorkspace:", currentWorkspace);
-    console.log("Google callback - JWT token:", jwt ? "Present" : "Missing");
-
     if (!jwt) {
-      console.log("Google callback - No JWT token, redirecting to failure URL");
       return res.redirect(
         `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`
       );
     }
 
-    // Redirect to the Google OAuth callback URL with the JWT token and current workspace
-    const redirectUrl = `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=success&access_token=${jwt}&current_workspace=${currentWorkspace}`;
-    console.log("Google callback - Redirecting to:", redirectUrl);
-    return res.redirect(redirectUrl);
+    // Redirect to the Google OAuth callback URL with the JWT token and return URL
+    const redirectUrl = new URL(config.FRONTEND_GOOGLE_CALLBACK_URL);
+    redirectUrl.searchParams.set('status', 'success');
+    redirectUrl.searchParams.set('access_token', jwt);
+    
+    // Only add returnUrl if it exists
+    if (returnUrl) {
+      redirectUrl.searchParams.set('returnUrl', returnUrl);
+    }
+
+    return res.redirect(redirectUrl.toString());
   }
 );
 

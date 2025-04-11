@@ -16,8 +16,9 @@ const GoogleOAuth = () => {
   const accessToken = params.get("access_token");
   const currentWorkspace = params.get("current_workspace");
   const status = params.get("status");
+  const returnUrl = params.get("returnUrl");
+
   React.useEffect(() => {
-    
     if (status === "failure") {
       setError("Authentication failed. Please try again.");
       setIsLoading(false);
@@ -28,7 +29,11 @@ const GoogleOAuth = () => {
       try {
         setAccessToken(accessToken);
         // Navigate to the appropriate page
-        if (currentWorkspace) {
+        if (returnUrl) {
+          setTimeout(() => {
+            navigate(returnUrl);
+          }, 500);
+        } else if (currentWorkspace) {
           setTimeout(() => {
             navigate(`/workspace/${currentWorkspace}`);
           }, 500);
@@ -45,7 +50,7 @@ const GoogleOAuth = () => {
       setError("No access token received. Please try again.");
       setIsLoading(false);
     }
-  }, [accessToken, currentWorkspace, navigate, setAccessToken, status]);
+  }, [accessToken, currentWorkspace, navigate, setAccessToken, status, returnUrl]);
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
