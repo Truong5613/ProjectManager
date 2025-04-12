@@ -150,239 +150,188 @@
 
 1.  **Chức năng đăng ký người dùng**
 
-> ![](PreviewImg/media/image1.png){width="6.509722222222222in"
-> height="3.829861111111111in"}
-> ![](PreviewImg/media/image2.png){width="6.490277777777778in"
-> height="3.839583333333333in"}
+> ![](PreviewImg/media/image1.png)
+> ![](PreviewImg/media/image2.png)
 >
 > **Hình 1** **Chức năng đăng ký người dùng.**
 
 2.  **Chức năng đăng nhập**
 
-> ![](PreviewImg/media/image3.png){width="6.5in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image3.png)
 >
 > ![](PreviewImg/media/image4.png){width="6.5in"
-> height="3.829861111111111in"}![](PreviewImg/media/image5.png){width="6.509722222222222in"
-> height="3.8020833333333335in"}
+> height="3.829861111111111in"}![](PreviewImg/media/image5.png)
 >
 > **Hình 2 Chức năng đăng nhập của người dùng.**
 
 3.  **Chức năng lấy tất cả workspace của người dùng.**
 
-> ![](PreviewImg/media/image6.png){width="6.509722222222222in"
-> height="3.811111111111111in"}
-> ![](PreviewImg/media/image7.png){width="6.490277777777778in"
-> height="3.792361111111111in"}
+> ![](PreviewImg/media/image6.png)
+> ![](PreviewImg/media/image7.png)
 >
 > **Hình 3 Lấy tất cả workspace của người dùng.***\
 > *
 
 4.  **Chức năng tạo workspace mới.**
 
-> ![](PreviewImg/media/image8.png){width="6.490277777777778in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image8.png)
 >
-> ![](PreviewImg/media/image9.png){width="6.490277777777778in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image9.png)
 >
-> ![](PreviewImg/media/image10.png){width="6.509722222222222in"
-> height="3.8020833333333335in"}
+> ![](PreviewImg/media/image10.png)
 >
 > **Hình 4 Tạo workspace mới.**
 
 5.  **Chức năng cập nhật workspace.**
 
-> ![](PreviewImg/media/image11.png){width="6.5in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image11.png)
 >
-> ![](PreviewImg/media/image12.png){width="6.509722222222222in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image12.png)
 >
 > **Hình 5 Cập nhật workspace.**
 
 6.  **Chức năng xóa workspace.**
 
-> ![](PreviewImg/media/image13.png){width="6.5in"
-> height="3.8208333333333333in"}
-> ![](PreviewImg/media/image14.png){width="6.5in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image13.png)
+> ![](PreviewImg/media/image14.png)
 >
 > **Hình 6 Xóa workspace.**
 
 7.  **Chức năng lấy workspace theo id**
 
-> ![](PreviewImg/media/image15.png){width="6.490277777777778in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image15.png)
 >
-> ![](PreviewImg/media/image16.png){width="6.5in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image16.png)
 >
 > **Hình 7 Lấy workspace theo id***.*
 
 8.  **Chức năng lấy member theo workspace id**
 
-> ![](PreviewImg/media/image17.png){width="6.490277777777778in"
-> height="3.829861111111111in"}
+> ![](PreviewImg/media/image17.png)
 >
-> ![](PreviewImg/media/image18.png){width="6.490277777777778in"
-> height="3.8208333333333333in"}
+> ![](PreviewImg/media/image18.png)
 >
 > **Hình 8 Lấy member theo workspace id.*\
 > ***
 
 9.  **Chức năng thống kê trong workspace.**
 
-> ![](PreviewImg/media/image19.png){width="6.5in"
-> height="3.811111111111111in"}
-> ![](PreviewImg/media/image20.png){width="6.509722222222222in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image19.png)
+> ![](PreviewImg/media/image20.png)
 >
 > **Hình 9 Thống kê trong workspace.**
 
 10. **Chức năng thay đổi role người dùng trong workspace.**
 
-> ![](PreviewImg/media/image21.png){width="6.490277777777778in"
-> height="3.8020833333333335in"}
-> ![](PreviewImg/media/image22.png){width="6.5in"
-> height="3.792361111111111in"}
+> ![](PreviewImg/media/image21.png)
+> ![](PreviewImg/media/image22.png)
 >
 > **Hình 10 Thay đổi role người dùng trong workspace.**
 
 11. **Chức năng mời người dùng vào workspace.**
 
-> ![](PreviewImg/media/image23.png){width="6.5in"
-> height="3.811111111111111in"}
-> ![](PreviewImg/media/image24.png){width="6.490277777777778in"
-> height="3.8020833333333335in"}
+> ![](PreviewImg/media/image23.png)
+> ![](PreviewImg/media/image24.png)
 >
 > **Hình 11 Chức năng mời người dùng vào workspace.***\
 > *
 
 12. **Chức năng xóa người dùng khỏi workspace.**
 
-> ![](PreviewImg/media/image25.png){width="6.5in"
-> height="3.8020833333333335in"}
-> ![](PreviewImg/media/image26.png){width="6.5in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image25.png)
+> ![](PreviewImg/media/image26.png)
 >
 > **Hình 12 Chức năng xóa người dùng khỏi workspace.***\
 > *
 
 13. **Chức năng lấy tất cả project trong workspace.**
 
-> ![](PreviewImg/media/image27.png){width="6.509722222222222in"
-> height="3.811111111111111in"}
-> ![](PreviewImg/media/image28.png){width="6.490277777777778in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image27.png)
+> ![](PreviewImg/media/image28.png)
 >
 > **Hình 13 Lấy tất cả project trong workspace.***\
 > *
 
 14. **Chức năng tạo project mới trong workspace.**
 
-> ![](PreviewImg/media/image29.png){width="6.490277777777778in"
-> height="3.811111111111111in"}
-> ![](PreviewImg/media/image30.png){width="6.5in"
-> height="3.8020833333333335in"}
+> ![](PreviewImg/media/image29.png)
+> ![](PreviewImg/media/image30.png)
 >
 > **Hình 14 Tạo project mới trong workspace.**
 
 15. **Chức năng cập nhật project bằng id**
 
-> ![](PreviewImg/media/image31.png){width="6.5in"
-> height="3.8020833333333335in"}
-> ![](PreviewImg/media/image32.png){width="6.509722222222222in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image31.png)
+> ![](PreviewImg/media/image32.png)
 >
 > **Hình 15 Cập nhật project bằng id**
 
 16. **Chức năng tìm kiếm project bằng id**
 
-> ![](PreviewImg/media/image33.png){width="6.490277777777778in"
-> height="3.811111111111111in"}
-> ![](PreviewImg/media/image34.png){width="6.5in"
-> height="3.829861111111111in"}
+> ![](PreviewImg/media/image33.png)
+> ![](PreviewImg/media/image34.png)
 >
 > **Hình 16 Tìm kiếm project bằng id.**
 
 17. **Chức năng xóa project của người dùng**
 
-> ![](PreviewImg/media/image35.png){width="6.490277777777778in"
-> height="3.8020833333333335in"}
-> ![](PreviewImg/media/image36.png){width="6.5in"
-> height="3.8208333333333333in"}
+> ![](PreviewImg/media/image35.png)
+> ![](PreviewImg/media/image36.png)
 >
 > **Hình 17 Xóa project của người dùng.**
 
 18. **Chức năng lấy thống kê của Project theo id**
 
-> ![](PreviewImg/media/image37.png){width="6.5in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image37.png)
 >
-> ![](PreviewImg/media/image38.png){width="6.5in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image38.png)
 >
 > **Hình 18 Lấy thống kê của Project theo id.**
 
 19. **Chức năng tạo Task mới trong project**
 
-> ![](PreviewImg/media/image39.png){width="6.5in"
-> height="3.811111111111111in"}
->
-> ![](PreviewImg/media/image40.png){width="6.509722222222222in"
-> height="3.8208333333333333in"}
->
+> ![](PreviewImg/media/image39.png)
+> ![](PreviewImg/media/image40.png)
+> 
 > **Hình 19 Tạo Task mới trong project.**
 
 20. **Chức năng lấy tất cả task trong workspace**
 
-> ![](PreviewImg/media/image41.png){width="6.5in"
-> height="3.8208333333333333in"}
-> ![](PreviewImg/media/image42.png){width="6.5in"
-> height="3.839583333333333in"}
+> ![](PreviewImg/media/image41.png)
+> ![](PreviewImg/media/image42.png)
 >
 > **Hình 20 Lấy tất cả các task trong workspace.**
 
 21. **Chức năng cập nhật thông tin Task theo id**
 
-> ![](PreviewImg/media/image43.png){width="6.5in"
-> height="3.811111111111111in"}
-> ![](PreviewImg/media/image44.png){width="6.5in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image43.png)
+> ![](PreviewImg/media/image44.png)
 >
 > **Hình 21 Cập nhật thông tin Task theo id.**
 
 22. **Chức năng xóa task trong project**
 
-> ![](PreviewImg/media/image45.png){width="6.509722222222222in"
-> height="3.8208333333333333in"}
-> ![](PreviewImg/media/image46.png){width="6.5in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image45.png)
+> ![](PreviewImg/media/image46.png)
 >
 > **Hình 22 Xóa task trong project.**
 
 23. **Chức năng lấy người dùng hiện tại**
 
-> ![](PreviewImg/media/image47.png){width="6.509722222222222in"
-> height="3.811111111111111in"}
-> ![](PreviewImg/media/image48.png){width="6.5in"
-> height="3.8208333333333333in"}
+> ![](PreviewImg/media/image47.png)
+> ![](PreviewImg/media/image48.png)
 >
 > **Hình 23 Lấy người dùng hiện tại.**
 
 24. **Chức năng cập nhật người dùng**
 
-> ![](PreviewImg/media/image49.png){width="6.5in"
-> height="3.8020833333333335in"}
+> ![](PreviewImg/media/image49.png)
 >
-> ![](PreviewImg/media/image50.png){width="6.5in"
-> height="3.8208333333333333in"}
+> ![](PreviewImg/media/image50.png)
 >
 > **Hình 24 Cập nhật người dùng.**
 >
-> ![](PreviewImg/media/image51.png){width="6.5in"
-> height="3.811111111111111in"}
+> ![](PreviewImg/media/image51.png)
 >
 > **Hình 25 Hình ảnh được lưu trên Cloudinary.**
 >
