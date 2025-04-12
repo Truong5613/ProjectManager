@@ -53,6 +53,27 @@ export default function CreateTaskForm(props: {
 
   const { mutate, isPending } = useMutation({
     mutationFn: createTaskMutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["workspaceAnalytics", workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ["recentTasks", workspaceId] });
+      if (projectId) {
+        queryClient.invalidateQueries({ queryKey: ["project-analytics", projectId] });
+      }
+      toast({
+        title: "Success",
+        description: "Task created successfully",
+      });
+      onClose();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   const { data, isLoading } = useGetProjectsInWorkspaceQuery({
@@ -152,31 +173,7 @@ export default function CreateTaskForm(props: {
       },
     };
 
-    mutate(payload, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["project-analytics", projectId],
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ["all-tasks", workspaceId],
-        });
-
-        toast({
-          title: "Success",
-          description: "Task created successfully",
-          variant: "success",
-        });
-        onClose();
-      },
-      onError: (error) => {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
+    mutate(payload);
   };
 
   return (

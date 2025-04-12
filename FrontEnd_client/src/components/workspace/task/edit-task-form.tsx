@@ -50,7 +50,9 @@ export default function EditTaskForm(props: {
   const { mutate, isPending } = useMutation({
     mutationFn: editTaskMutationFn,
     onSuccess: () => {
+      // Invalidate all possible task queries
       queryClient.invalidateQueries({ queryKey: ["tasks", workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
       queryClient.invalidateQueries({ queryKey: ["workspaceAnalytics", workspaceId] });
       queryClient.invalidateQueries({ queryKey: ["recentTasks", workspaceId] });
       queryClient.invalidateQueries({ queryKey: ["task", task._id] });
@@ -180,14 +182,7 @@ export default function EditTaskForm(props: {
   return (
     <div className="w-full h-auto max-w-full">
       <div className="h-full">
-        <div className="mb-5 pb-2 border-b">
-          <h1 className="text-xl tracking-[-0.16px] dark:text-[#fcfdffef] font-semibold mb-1 text-center sm:text-left">
-            Edit Task
-          </h1>
-          <p className="text-muted-foreground text-sm leading-tight">
-            Update task details and assignments
-          </p>
-        </div>
+        
         <Form {...form}>
           <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
             <div>

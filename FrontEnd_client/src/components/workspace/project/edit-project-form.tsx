@@ -25,6 +25,7 @@ import useWorkspaceId from "@/hooks/use-workspace-id";
 import { editProjectMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
+import { set } from "date-fns";
 
 export default function EditProjectForm(props: {
   project?: ProjectType;
@@ -34,13 +35,13 @@ export default function EditProjectForm(props: {
   const workspaceId = useWorkspaceId();
   const queryClient = useQueryClient();
 
-  const [emoji, setEmoji] = useState("📊");
+  const [emoji, setEmoji] = useState(project?.emoji || "📊");
   const projectId = project?._id as string;
  
   const { mutate, isPending } = useMutation({
     mutationFn: editProjectMutationFn,
   });
-
+  
   const formSchema = z.object({
     name: z.string().trim().min(1, {
       message: "Project title is required",
@@ -51,9 +52,10 @@ export default function EditProjectForm(props: {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: project?.name || "",
+      description: project?.description || "",
     },
+    
   });
 
   const handleEmojiSelection = (emoji: string) => {
@@ -98,17 +100,6 @@ export default function EditProjectForm(props: {
   return (
     <div className="w-full h-auto max-w-full">
       <div className="h-full">
-        <div className="mb-5 pb-2 border-b">
-          <h1
-            className="text-xl tracking-[-0.16px] dark:text-[#fcfdffef] font-semibold mb-1
-           text-center sm:text-left"
-          >
-            Edit Project
-          </h1>
-          <p className="text-muted-foreground text-sm leading-tight">
-            Update the project details to refine task management
-          </p>
-        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="mb-4">
@@ -160,9 +151,9 @@ export default function EditProjectForm(props: {
                     </FormLabel>
                     <FormControl>
                       <Textarea
-                        rows={4}
-                        placeholder="Projects description"
-                        {...field}
+                      rows={4}
+                      placeholder="Projects description"
+                      {...field}
                       />
                     </FormControl>
                     <FormMessage />
